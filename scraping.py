@@ -9,6 +9,7 @@ from selenium.webdriver.chrome import service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium import webdriver
+import re
 
 # driver = webdriver.Chrome()
 driver = webdriver.Firefox()
@@ -26,6 +27,15 @@ def get_id_from_ieee(url):
         ids.append(element.get_attribute("id"))
         #print(element.get_attribute("id"))
     return ids
+
+def word_normalization(str):
+    #改行削除と特殊文字削除
+    str_ =  re.sub(r"[^a-zA-Z0-9 ]", "", str.strip())
+
+    #一般的な単語削除
+    remove_str = ["again","ve","couldn","hasnt","yourselves"]
+
+    return str_
 
 def search_ieee():
     for i in range(2):
@@ -47,15 +57,24 @@ def search_ieee():
 
             # Get Title
             title_elem = driver.find_element("xpath", '//*[@id="LayoutWrapper"]/div/div/div/div[3]/div/xpl-root/div/xpl-document-details/div/div[1]/section[2]/div/xpl-document-header/section/div[2]/div/div/div[1]/div/div[1]/h1/span')
-            title_text = title_elem.text.strip()
-            print("Title:", title_text)
+
+            #正規化
+            title = word_normalization(title_elem.text)
+
+            print("Title:", title)
 
             # Get Abstract
             # abstract_elem = driver.find_element("xpath", '//*[@id="LayoutWrapper"]/div/div/div/div[3]/div/xpl-root/div/xpl-document-details/div/div[1]/div/div[2]/section/div[2]/div/xpl-document-abstract/section/div[2]/div[1]/div/div/div')
             abstract_elems= driver.find_element(By.CLASS_NAME, "abstract-text.row")
             ab = abstract_elems.find_element(By.CLASS_NAME, "u-mb-1")
-            ab_text = ab.text[10:].strip()
-            print("Abstract:", ab_text)
+
+            # #改行削除
+            # ab_text = ab.text[10:].strip()
+
+            #正規化
+            abstract = word_normalization(ab.text[10:])
+
+            print("Abstract:", abstract)
 
             # for ab_elem in abstract_elems:
             #     ab = ab_elem.find_element(By.CLASS_NAME, "u-pb-1")
