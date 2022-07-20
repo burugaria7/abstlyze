@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
+import re
 import traceback
+
+from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import chromedriver_binary
@@ -9,10 +12,14 @@ from selenium.webdriver.chrome import service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium import webdriver
-import re
+import nltk
+from nltk.corpus import stopwords
+
+import csv_parser
 
 # driver = webdriver.Chrome()
 driver = webdriver.Firefox()
+nltk.download('stopwords')
 
 def get_id_from_ieee(url):
     # 取得先URLにアクセス
@@ -29,16 +36,29 @@ def get_id_from_ieee(url):
     return ids
 
 def word_normalization(str):
-    #改行削除と特殊文字削除
-    str_ =  re.sub(r"[^a-zA-Z0-9 ]", "", str.strip())
+    #特殊文字削除
+    str_ =  re.sub(r"[^a-zA-Z0-9 ]", "", str)
 
-    #一般的な単語削除
-    remove_str = ["again","ve","couldn","hasnt","yourselves"]
+    #小文字に置き換え
+    str_ = str_.lower()
+
+    #一旦改行分割し、スペースで結合
+    dv_text = str_.splitlines()
+    str_ = ' '.join(dv_text)
+
+    #HTML関連タグの除去
+    # changed_text = BeautifulSoup(str_)
+    # str_ = changed_text.get_text()
+
+    #一般的な単語削除(NLTK使用)
+    dv_text = str_.split()
+    A = [word for word in dv_text if word not in stopwords.words('english')]
+    str_ = ' '.join(A)
 
     return str_
 
 def search_ieee():
-    for i in range(2):
+    for i in range(80):
         print(i,"\n")
         url = "https://ieeexplore.ieee.org/search/searchresult.jsp?queryText=" \
               "robust%20clustering&highlight=true&returnType=" \
@@ -49,38 +69,47 @@ def search_ieee():
         num = 0
         for id in ids:
 
-            paper_url = "https://ieeexplore.ieee.org/document/"+str(id)+"/"
-            print("No.",i*25+num," ",paper_url)
+            data = [["","",""]]
+            try:
+                paper_url = "https://ieeexplore.ieee.org/document/" + str(id) + "/"
 
-            driver.get(paper_url)
-            time.sleep(2)
+                data[0][1] = paper_url
+                print("No.", i * 25 + num, " ", paper_url)
 
-            # Get Title
-            title_elem = driver.find_element("xpath", '//*[@id="LayoutWrapper"]/div/div/div/div[3]/div/xpl-root/div/xpl-document-details/div/div[1]/section[2]/div/xpl-document-header/section/div[2]/div/div/div[1]/div/div[1]/h1/span')
+                driver.get(paper_url)
+                time.sleep(2)
 
-            #正規化
-            title = word_normalization(title_elem.text)
+                # Get Title
+                title_elem = driver.find_element("xpath",
+                                                 '//*[@id="LayoutWrapper"]/div/div/div/div[3]/div/xpl-root/div/xpl-document-details/div/div[1]/section[2]/div/xpl-document-header/section/div[2]/div/div/div[1]/div/div[1]/h1/span')
 
-            print("Title:", title)
+                # 正規化
+                title = word_normalization(title_elem.text)
 
-            # Get Abstract
-            # abstract_elem = driver.find_element("xpath", '//*[@id="LayoutWrapper"]/div/div/div/div[3]/div/xpl-root/div/xpl-document-details/div/div[1]/div/div[2]/section/div[2]/div/xpl-document-abstract/section/div[2]/div[1]/div/div/div')
-            abstract_elems= driver.find_element(By.CLASS_NAME, "abstract-text.row")
-            ab = abstract_elems.find_element(By.CLASS_NAME, "u-mb-1")
+                data[0][0] = title
+                print("Title:", title)
 
-            # #改行削除
-            # ab_text = ab.text[10:].strip()
+                # Get Abstract
+                # abstract_elem = driver.find_element("xpath", '//*[@id="LayoutWrapper"]/div/div/div/div[3]/div/xpl-root/div/xpl-document-details/div/div[1]/div/div[2]/section/div[2]/div/xpl-document-abstract/section/div[2]/div[1]/div/div/div')
+                abstract_elems = driver.find_element(By.CLASS_NAME, "abstract-text.row")
+                ab = abstract_elems.find_element(By.CLASS_NAME, "u-mb-1")
 
-            #正規化
-            abstract = word_normalization(ab.text[10:])
+                # 正規化
+                abstract = word_normalization(ab.text[10:])
 
-            print("Abstract:", abstract)
+                data[0][2] = abstract
+                print("Abstract:", abstract)
 
-            # for ab_elem in abstract_elems:
-            #     ab = ab_elem.find_element(By.CLASS_NAME, "u-pb-1")
-            #     print("Abstract\t", ab.text)
+            except Exception as e:  # これは最後に書く
+                print('Unknown exception!')
+                print(e)
 
-            # print("Abstract\t", abstract_elem[0].text)
+            try:
+                csv_parser.add_raw_csv(data)
+            except Exception as e:  # これは最後に書く
+                print('Unknown exception!')
+                print(e)
+
             num += 1
 
     driver.quit()
