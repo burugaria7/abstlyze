@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 from gensim.models.doc2vec import Doc2Vec
 from scipy.cluster.hierarchy import linkage, fcluster, dendrogram
 from matplotlib.font_manager import FontProperties
+import csv
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 # 階層型クラスタリングの実施
@@ -38,15 +40,57 @@ def save_cluster(doc_index, clustered):
     np.savetxt("./cluster.csv", doc_cluster, delimiter=',', fmt='%.0f')
     print('save cluster.')
 
-if __name__ == '__main__':
-    #使用するデータ数
-    num = 2000
-    m = Doc2Vec.load("./doc2vec.model")
-    # vectors_list = [m.docvecs[n] for n in range(len(m.docvecs))]
-    vectors_list = [m.docvecs[n] for n in range(len(m.docvecs))]
-    vectors_list = vectors_list[:num]
+def analyze():
+    print("")
 
-    threshold = 0.8
-    linkage_result, threshold, clustered = hierarchical_clustering(emb=vectors_list, threshold=threshold)
-    plot_dendrogram(linkage_result=linkage_result, doc_labels=list(range(num)), threshold=threshold)
-    save_cluster(list(range(num)), clustered)
+    with open("./data.txt", 'r') as f:
+        datas = [[i, data] for i, data in enumerate(f)]
+        #datas = [[i, data.split('\t')[2]] for i, data in enumerate(f)]
+
+    docs = ['', '', '', '', '', '']
+
+    # クラスタリング結果を読み込む
+    with open("./cluster.csv", 'r') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            doc = datas[int(row[0])][1]
+            # doc = ' '.join(set(doc.split())) #同一タイトル内で重複削除
+            # クラスター毎に本文を纏める
+            docs[int(row[1]) - 1] += ' {0}'.format(doc)
+
+    # tf-idfの計算
+    vectorizer = TfidfVectorizer(max_df=0.90, max_features=100)
+    # 文書全体の90%以上で出現する単語は無視する
+    # 且つ、出現上位100までの単語で計算する
+    X = vectorizer.fit_transform(docs)
+    # print('feature_names:', vectorizer.get_feature_names())
+
+    words = vectorizer.get_feature_names()
+    for doc_id, vec in zip(range(len(docs)), X.toarray()):
+        print('doc_id:', doc_id + 1)
+        for w_id, tfidf in sorted(enumerate(vec), key=lambda x: x[1], reverse=True)[:20]:
+            lemma = words[w_id]
+            print('\t{0:s}: {1:f}'.format(lemma, tfidf))
+
+if __name__ == '__main__':
+
+    #####
+    #クラスタリングの実行
+    #####
+
+    #使用するデータ数
+    # num = 2000
+    # m = Doc2Vec.load("./doc2vec.model")
+    # # vectors_list = [m.docvecs[n] for n in range(len(m.docvecs))]
+    # vectors_list = [m.docvecs[n] for n in range(len(m.docvecs))]
+    # vectors_list = vectors_list[:num]
+    #
+    # threshold = 0.2
+    # linkage_result, threshold, clustered = hierarchical_clustering(emb=vectors_list, threshold=threshold)
+    # plot_dendrogram(linkage_result=linkage_result, doc_labels=list(range(num)), threshold=threshold)
+    # save_cluster(list(range(num)), clustered)
+
+    ###
+    #分析の実行
+    ###
+    analyze()
