@@ -58,11 +58,11 @@ def word_normalization(str):
     return str_
 
 def search_ieee():
-    for i in range(80):
+    for i in range(262):
         print(i,"\n")
         url = "https://ieeexplore.ieee.org/search/searchresult.jsp?queryText=" \
               "robust%20clustering&highlight=true&returnType=" \
-              "SEARCH&matchPubs=true&ranges=2018_2022_Year&returnFacets=" \
+              "SEARCH&matchPubs=true&ranges=2000_2022_Year&returnFacets=" \
               "ALL&pageNumber=" + str(i)
         ids = get_id_from_ieee(url)
         print(ids)
