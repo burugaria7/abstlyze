@@ -43,14 +43,14 @@ def save_cluster(doc_index, clustered):
 def analyze():
     print("")
 
-    with open("./data.txt", 'r') as f:
+    with open("../data.txt", 'r') as f:
         datas = [[i, data] for i, data in enumerate(f)]
         #datas = [[i, data.split('\t')[2]] for i, data in enumerate(f)]
 
     docs = ['', '', '', '', '', '']
 
     # クラスタリング結果を読み込む
-    with open("./cluster.csv", 'r') as f:
+    with open("../cluster.csv", 'r') as f:
         reader = csv.reader(f)
         for row in reader:
             doc = datas[int(row[0])][1]

@@ -1,16 +1,8 @@
 # -*- coding: utf-8 -*-
 import re
-import traceback
 
-from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-import chromedriver_binary
 import time
-from selenium import webdriver
-from selenium.webdriver.chrome import service
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium import webdriver
 import nltk
 from nltk.corpus import stopwords

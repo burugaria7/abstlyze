@@ -2,13 +2,13 @@ import csv
 from csv import reader
 
 def add_raw_csv(data):
-    filepath = "./data.csv"
+    filepath = "../data.csv"
     with open(filepath, 'a',newline="") as f:
         writer = csv.writer(f)
         writer.writerows(data)
 
 def csv_to_text():
-    filepath = "./data.csv"
+    filepath = "../data.csv"
     textpath = "./data.txt"
     with open(filepath, "r") as my_file:
         # pass the file object to reader()
