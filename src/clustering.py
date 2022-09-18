@@ -28,7 +28,7 @@ def plot_dendrogram(linkage_result, doc_labels, threshold):
     plt.title('Dendrogram')
     plt.xticks(fontsize=10)
     print('end plot.')
-    plt.savefig("./hierarchy.png")
+    plt.savefig("../hierarchy.png")
 
 
 # 階層型クラスタリング結果の保存
@@ -37,20 +37,21 @@ def save_cluster(doc_index, clustered):
     doc_cluster = doc_cluster.T
     doc_cluster = doc_cluster.astype(np.dtype(int).type)
     doc_cluster = doc_cluster[np.argsort(doc_cluster[:, 1])]
-    np.savetxt("./cluster.csv", doc_cluster, delimiter=',', fmt='%.0f')
+    np.savetxt("../cluster.csv", doc_cluster, delimiter=',', fmt='%.0f')
     print('save cluster.')
+
 
 def analyze():
     print("")
 
-    with open("../data.txt", 'r') as f:
+    with open("../data_6k.txt", 'r') as f:
         datas = [[i, data] for i, data in enumerate(f)]
-        #datas = [[i, data.split('\t')[2]] for i, data in enumerate(f)]
+        # datas = [[i, data.split('\t')[2]] for i, data in enumerate(f)]
 
-    docs = ['', '', '', '', '', '']
+    docs = ['', '', '', '', '']
 
     # クラスタリング結果を読み込む
-    with open("../cluster.csv", 'r') as f:
+    with open("../cluster_6k_04.csv", 'r') as f:
         reader = csv.reader(f)
         for row in reader:
             doc = datas[int(row[0])][1]
@@ -72,25 +73,24 @@ def analyze():
             lemma = words[w_id]
             print('\t{0:s}: {1:f}'.format(lemma, tfidf))
 
+
 if __name__ == '__main__':
-
     #####
-    #クラスタリングの実行
+    # クラスタリングの実行
     #####
 
-    #使用するデータ数
+    # 使用するデータ数
     # num = 2000
-    # m = Doc2Vec.load("./doc2vec.model")
-    # # vectors_list = [m.docvecs[n] for n in range(len(m.docvecs))]
+    # m = Doc2Vec.load("../doc2vec_6k.model")
     # vectors_list = [m.docvecs[n] for n in range(len(m.docvecs))]
     # vectors_list = vectors_list[:num]
     #
-    # threshold = 0.2
+    # threshold = 0.4
     # linkage_result, threshold, clustered = hierarchical_clustering(emb=vectors_list, threshold=threshold)
     # plot_dendrogram(linkage_result=linkage_result, doc_labels=list(range(num)), threshold=threshold)
     # save_cluster(list(range(num)), clustered)
 
     ###
-    #分析の実行
+    # 分析の実行
     ###
     analyze()

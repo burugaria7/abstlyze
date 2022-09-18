@@ -16,7 +16,7 @@ from tensorboardX import SummaryWriter
 
 def make_vec():
     # 空白で単語を区切り、改行で文書を区切っているテキストデータ
-    with open("../data.txt", 'r') as f:
+    with open("../data_6k.txt", 'r') as f:
          # 文書ごとに単語を分割してリストにする。
       trainings = [TaggedDocument(words = data.split(),tags = [i]) for i,data in enumerate(f)]
     # 学習の実行
@@ -27,7 +27,7 @@ def make_vec():
 
     m = Doc2Vec(documents= trainings, dm = 1, vector_size=300, window=8, min_count=10, workers=4)
     # モデルのセーブ
-    m.save("./doc2vec.model")
+    m.save("../doc2vec_6k.model")
 
 def save_embedding_projector_files():
     vector_file = "../vec.tsv"
@@ -48,7 +48,7 @@ def save_embedding_projector_files():
             g.write(word + '\n')
 
 def convert_to_tsv():
-    m = Doc2Vec.load("./doc2vec.model")
+    m = Doc2Vec.load("./doc2vec_6k.model")
     weights = []
     labels = []
     for i in range(0, len(m.docvecs)):
@@ -64,4 +64,4 @@ def convert_to_tsv():
 
 if __name__ == '__main__':
     make_vec()
-    convert_to_tsv()
+    # convert_to_tsv()

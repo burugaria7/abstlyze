@@ -7,18 +7,30 @@ def add_raw_csv(data):
         writer = csv.writer(f)
         writer.writerows(data)
 
+# CSVからテキストに変換するだけ
 def csv_to_text():
-    filepath = "../data.csv"
-    textpath = "./data.txt"
+
+    str = ""
+    filepath = "../data_6k.csv"
+    textpath = "../data_6k.txt"
     with open(filepath, "r") as my_file:
         # pass the file object to reader()
         file_reader = reader(my_file)
         # do this for all the rows
+
+        # a = 0
         for i in file_reader:
-            # print the rows
-            print(i[2])
-            with open(textpath, 'a') as ff:
-                print(i[2], file=ff)
+            str += i[2]
+            str += "\n"
+        #     # print the rows
+        #     print(str(a) + " " + i[2].strip('\n'))
+        #     a += 1
+        #     with open(textpath, 'a+') as ff:
+        #         print(i[2].strip('\n'), file=ff)
+
+    f = open(textpath, mode='w')
+    f.write(str.rstrip('\r\n'))
+    f.close()
 
 if __name__ == '__main__':
     # data = [["Title","URL","Abstract"]]
