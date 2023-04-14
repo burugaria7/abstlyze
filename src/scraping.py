@@ -13,6 +13,7 @@ import csv_parser
 driver = webdriver.Firefox()
 nltk.download('stopwords')
 
+
 def get_id_from_ieee(url):
     # 取得先URLにアクセス
     driver.get(url)
@@ -24,36 +25,38 @@ def get_id_from_ieee(url):
 
     for element in elements:
         ids.append(element.get_attribute("id"))
-        #print(element.get_attribute("id"))
+        # print(element.get_attribute("id"))
     return ids
 
-def word_normalization(str):
-    #特殊文字削除
-    str_ =  re.sub(r"[^a-zA-Z0-9 ]", "", str)
 
-    #小文字に置き換え
+def word_normalization(str):
+    # 特殊文字削除
+    str_ = re.sub(r"[^a-zA-Z0-9 ]", "", str)
+
+    # 小文字に置き換え
     str_ = str_.lower()
 
-    #一旦改行分割し、スペースで結合
+    # 一旦改行分割し、スペースで結合
     dv_text = str_.splitlines()
     str_ = ' '.join(dv_text)
 
-    #HTML関連タグの除去
+    # HTML関連タグの除去
     # changed_text = BeautifulSoup(str_)
     # str_ = changed_text.get_text()
 
-    #一般的な単語削除(NLTK使用)
+    # 一般的な単語削除(NLTK使用)
     dv_text = str_.split()
     A = [word for word in dv_text if word not in stopwords.words('english')]
     str_ = ' '.join(A)
 
     return str_
 
+
 def search_ieee():
     for i in range(262):
-        print(i,"\n")
+        print(i, "\n")
         url = "https://ieeexplore.ieee.org/search/searchresult.jsp?queryText=" \
-              "robust%20clustering&highlight=true&returnType=" \
+              "\"clustering\"%20\"robust\"&highlight=true&returnType=" \
               "SEARCH&matchPubs=true&ranges=2000_2022_Year&returnFacets=" \
               "ALL&pageNumber=" + str(i)
         ids = get_id_from_ieee(url)
@@ -61,7 +64,7 @@ def search_ieee():
         num = 0
         for id in ids:
 
-            data = [["","",""]]
+            data = [["", "", ""]]
             try:
                 paper_url = "https://ieeexplore.ieee.org/document/" + str(id) + "/"
 
@@ -73,7 +76,7 @@ def search_ieee():
 
                 # Get Title
                 title_elem = driver.find_element("xpath",
-                                                 '//*[@id="LayoutWrapper"]/div/div/div/div[3]/div/xpl-root/div/xpl-document-details/div/div[1]/section[2]/div/xpl-document-header/section/div[2]/div/div/div[1]/div/div[1]/h1/span')
+                                                 '//*[@id="LayoutWrapper"]/div/div/div[3]/div/xpl-root/div/xpl-document-details/div/div[1]/section[2]/div/xpl-document-header/section/div[2]/div/div/div[1]/div/div[1]/h1/span')
 
                 # 正規化
                 title = word_normalization(title_elem.text)
@@ -83,7 +86,7 @@ def search_ieee():
 
                 # Get Abstract
                 # abstract_elem = driver.find_element("xpath", '//*[@id="LayoutWrapper"]/div/div/div/div[3]/div/xpl-root/div/xpl-document-details/div/div[1]/div/div[2]/section/div[2]/div/xpl-document-abstract/section/div[2]/div[1]/div/div/div')
-                abstract_elems = driver.find_element(By.CLASS_NAME, "abstract-text.row")
+                abstract_elems = driver.find_element(By.CLASS_NAME, "col-12")
                 ab = abstract_elems.find_element(By.CLASS_NAME, "u-mb-1")
 
                 # 正規化
@@ -106,6 +109,6 @@ def search_ieee():
 
     driver.quit()
 
+
 if __name__ == '__main__':
     search_ieee()
-
