@@ -87,7 +87,7 @@ def fsas():
                 data = [title, author, abst, url_, jj, url]
                 csv_parser.add_raw_csv_with_filepath(data, "fsas.csv")
 
-                time.sleep(1 + random.random())
+        time.sleep(random.random())
 
 
 if __name__ == "__main__":
