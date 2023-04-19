@@ -1,15 +1,22 @@
 import csv
 from csv import reader
 
+
 def add_raw_csv(data):
     filepath = "../data.csv"
-    with open(filepath, 'a',newline="") as f:
-        writer = csv.writer(f)
+    with open(filepath, 'a', newline="", encoding='utf-16') as f:
+        writer = csv.writer(f, dialect='excel', delimiter='\t', quoting=csv.QUOTE_ALL)
         writer.writerows(data)
+
+
+def add_raw_csv_with_filepath(data, filepath):
+    with open(filepath, 'a', newline="", encoding='utf-16') as f:
+        writer = csv.writer(f, dialect='excel', delimiter='\t', quoting=csv.QUOTE_ALL)
+        writer.writerow(data)
+
 
 # CSVからテキストに変換するだけ
 def csv_to_text():
-
     str = ""
     filepath = "../data_6k.csv"
     textpath = "../data_6k.txt"
@@ -31,6 +38,7 @@ def csv_to_text():
     f = open(textpath, mode='w')
     f.write(str.rstrip('\r\n'))
     f.close()
+
 
 if __name__ == '__main__':
     # data = [["Title","URL","Abstract"]]
