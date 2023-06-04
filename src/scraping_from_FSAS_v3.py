@@ -16,11 +16,16 @@ driver = webdriver.Chrome()
 
 
 def fsas():
-    url = "https://www.sciencedirect.com/journal/fuzzy-sets-and-systems/vol/460/suppl/C"
+    url = "https://www.sciencedirect.com/journal/fuzzy-sets-and-systems/vol/30/index/I"
     driver.get(url)
     time.sleep(1 + random.random())
-    driver.find_element(By.XPATH,
-                        "//*[@id=\"aa-expand-all-articles-previews\"]/div/label/span[1]").click()
+
+    try:
+        driver.find_element(By.XPATH,
+                            "//*[@id=\"aa-expand-all-articles-previews\"]/div/label/span[1]").click()
+    except:
+        print("EEE")
+
     time.sleep(2 + random.random() + random.random())
 
     for i in range(2000):
@@ -39,10 +44,13 @@ def fsas():
 
         print(url)
 
-        # ここでAbstract全表示を有効にする
-        driver.find_element(By.XPATH,
-                            "//*[@id=\"aa-expand-all-articles-previews\"]/div/label/span[1]").click()
-        time.sleep(2 + random.random() + random.random())
+        try:
+            # ここでAbstract全表示を有効にする
+            driver.find_element(By.XPATH,
+                                "//*[@id=\"aa-expand-all-articles-previews\"]/div/label/span[1]").click()
+            time.sleep(2 + random.random() + random.random())
+        except:
+            print("EEEE")
 
         # クラスがとたまにバグるからXPATHで指定
         # info = driver.find_elements(By.CLASS_NAME, "js-special-issue-title")
