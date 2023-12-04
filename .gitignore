@@ -24,3 +24,6 @@ runs/Jul22_02-08-25_Re/00000/default/tensors.tsv
 geckodriver.exe
 geckodriver.log
 src/config.json
+*.png
+*.html
+*.pyc
